@@ -81,11 +81,14 @@ async def fetch_movie_info(request: MovieRequest):
 
 @router.post("/recommendations", response_model=List[RecommendationResponse])
 async def recommend_similar_movies(request: MovieRequest):
+    print(request.title)
     base_movie = get_movie(request.title)
+    print(base_movie)
     if not base_movie:
         raise HTTPException(status_code=404, detail="Base movie not found")
 
     recommendations = await recommend_movies_async(base_movie)
+    print(len(recommendations))
 
     return [
         RecommendationResponse(
@@ -97,5 +100,5 @@ async def recommend_similar_movies(request: MovieRequest):
             plot=movie.get("Plot"),
             poster=movie.get("Poster")
         )
-        for movie in recommendations[:5]  # top 5
+        for movie in recommendations[:25]  # top 25
     ]

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routers import image_search
+from routers import image_search , omdb_router
 
 load_dotenv()
 
@@ -18,6 +18,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(image_search.router, prefix="/image-search", tags=["image-search"])
+app.include_router(omdb_router.router, prefix="/omdb", tags=["omdb"])
 
 @app.get("/")
 def read_root():

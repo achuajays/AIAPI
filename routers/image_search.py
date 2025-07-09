@@ -1,91 +1,67 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import requests
-import json
 import os
 from typing import Optional
 
 router = APIRouter()
 
-class ImageSearchRequest(BaseModel):
+class PosterSearchRequest(BaseModel):
     query: str
-    
-class ImageSearchResponse(BaseModel):
-    data: dict 
 
-# Get API key from environment variable
-api_key = os.getenv("SERPER_API_KEY")
+class PosterSearchResponse(BaseModel):
+    data: dict
+
+# Get OMDb API key from environment variable
+api_key = "e9416d5f"
 
 @router.get("/")
 def read_root():
-    return {"message": "Welcome to the Image Search API"}
+    return {"message": "Welcome to the OMDb Poster Search API"}
 
-@router.post("/search", response_model=ImageSearchResponse)
-async def search_images(search_request: ImageSearchRequest):
+@router.post("/search", response_model=PosterSearchResponse)
+async def search_images(request: PosterSearchRequest):
     """
-    Search for images using Google Serper API
+    Search for a movie poster using OMDb API
     """
     if not api_key:
         raise HTTPException(
-            status_code=400, 
-            detail="API key is required. Please set SERPER_API_KEY environment variable"
+            status_code=400,
+            detail="API key is required. Please set OMDB_API_KEY environment variable"
         )
-    
-    url = "https://google.serper.dev/images"
-    
-    payload = json.dumps({
-        "q": search_request.query
-    })
-    
-    headers = {
-        'X-API-KEY': api_key,
-        'Content-Type': 'application/json'
-    }
-    
-    try:
-        response = requests.post(url, headers=headers, data=payload)
-        response.raise_for_status()
-        
-        res = response.json()
-        print("Full response:", res)
-        
-        # Check if the response has the expected structure
-        if "images" not in res:
-            raise HTTPException(
-                status_code=500,
-                detail="Unexpected response format from Serper API"
-            )
-        
-        images = res["images"]
-        print("Images found:", len(images))
-        
-        # Get first image URL if available
-        first_image_url = None
-        if images and len(images) > 0:
-            first_image_url = images[0].get("imageUrl")
-            print("First image URL:", first_image_url)
 
-        return ImageSearchResponse(
-            data={"image_url": first_image_url}
-        )
-        
+    url = "http://www.omdbapi.com/"
+    print(request.query)
+    params = {
+        "apikey": api_key,
+        "t": request.query.strip()
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        print(response)
+
+        response.raise_for_status()
+        print(response)
+        movie_data = response.json()
+        print(movie_data)
+
+        if movie_data.get("Response") != "True":
+            raise HTTPException(
+                status_code=404,
+                detail=movie_data.get("Error", "Movie not found")
+            )
+
+        poster_url = movie_data.get("Poster", None)
+        if not poster_url or poster_url == "N/A":
+            poster_url = None
+
+        return PosterSearchResponse(data={"image_url": poster_url})
+
     except requests.exceptions.RequestException as e:
-        # Handle case where response might not be defined
-        status_code = 500
-        try:
-            if hasattr(e, 'response') and e.response is not None:
-                status_code = e.response.status_code
-        except:
-            pass
-            
-        raise HTTPException(
-            status_code=status_code,
-            detail=f"Error from Serper API: {str(e)}"
-        )
-    except json.JSONDecodeError:
         raise HTTPException(
             status_code=500,
-            detail="Invalid JSON response from Serper API"
+            detail=f"Error connecting to OMDb API: {str(e)}"
         )
     except Exception as e:
         raise HTTPException(

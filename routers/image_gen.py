@@ -31,7 +31,7 @@ def generate_image(request: PromptRequest):
                 "response_extension": "png",
                 "width": 1024,
                 "height": 1024,
-                "num_inference_steps": 28,
+                "num_inference_steps": 4,
                 "negative_prompt": "",
                 "seed": -1,
                 "loras": None

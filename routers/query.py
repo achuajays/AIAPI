@@ -2,7 +2,10 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from groq import Groq
+from dotenv import load_dotenv
 import os
+
+load_dotenv() 
 
 # Initialize router
 router = APIRouter(prefix="/query", tags=["query"])

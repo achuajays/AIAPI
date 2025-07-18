@@ -1,5 +1,5 @@
 # FastAPI Multi-Service API
-
+![FastAPI Multi-Service API](./image.png)
 A comprehensive FastAPI application that provides multiple services including image generation, movie search, image search, and AI-powered query processing.
 
 ## 🚀 Features

@@ -5,6 +5,7 @@ A comprehensive FastAPI application that provides multiple services including im
 ## 🚀 Features
 
 - **Image Generation**: Generate images using AI models via Nebius API
+- **Speech to Text**: convert Speech to text using Groq API KEY 
 - **Movie Search**: Search for movies and get recommendations using OMDb API
 - **Image Search**: Search for images using Google Serper API
 - **AI Query Processing**: Process queries using Groq LLM models

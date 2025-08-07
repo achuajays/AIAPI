@@ -19,7 +19,7 @@ class QueryRequest(BaseModel):
     query: str
     model: Optional[str] = "meta-llama/llama-4-scout-17b-16e-instruct"
     temperature: Optional[float] = 0.7
-    max_tokens: Optional[int] = 1024
+    max_tokens: Optional[int] = 15000
 
 
 class QueryResponse(BaseModel):
